@@ -5,13 +5,18 @@
 #include <Eigen/Geometry>
 #include <algorithm>
 #include <set>
+#include "FPRF.h"
 
-class Distance
+namespace Distance
 {
- public:
+  inline double clamp(double u)
+  {
+    return std::min(1.0, std::max(u, 0.0));
+  }
+
   // Efficiently calculates whether or not a point p is closer to than eta distance to the plane spanned by vertices q0, q1, and q2.
   // This method does not require any floating point divisions and so is significantly faster than computing the distance itself.
-  static bool vertexPlaneDistanceLessThan(const Eigen::Vector3d &p, 
+  inline bool vertexPlaneDistanceLessThan(const Eigen::Vector3d &p, 
 					    const Eigen::Vector3d &q0, const Eigen::Vector3d &q1, const Eigen::Vector3d &q2, double eta)
   {
 	Eigen::Vector3d c = (q1-q0).cross(q2-q0);
@@ -20,7 +25,7 @@ class Distance
 
   // Efficiently calculates whether or not the line spanned by vertices (p0, p1) is closer than eta distance to the line spanned by vertices (q0, q1).
   // This method does not require any floating point divisions and so is significantly faster than computing the distance itself.
-  static bool lineLineDistanceLessThan(const Eigen::Vector3d &p0, const Eigen::Vector3d &p1,
+  inline bool lineLineDistanceLessThan(const Eigen::Vector3d &p0, const Eigen::Vector3d &p1,
 					  const Eigen::Vector3d &q0, const Eigen::Vector3d &q1, double eta)
   {
 	Eigen::Vector3d c = (p1-p0).cross(q1-q0);
@@ -29,7 +34,7 @@ class Distance
 
   // Computes the vector between a point p and the closest point to p on the triangle (q0, q1, q2). Also returns the barycentric coordinates of this closest point on the triangle;
   // q0bary is the barycentric coordinate of q0, etc. (The distance from p to the triangle is the norm of this vector.)
-  static Eigen::Vector3d vertexFaceDistance(const Eigen::Vector3d &p, 
+  inline Eigen::Vector3d vertexFaceDistance(const Eigen::Vector3d &p, 
 					    const Eigen::Vector3d &q0, const Eigen::Vector3d &q1, const Eigen::Vector3d &q2, 
 					    double &q0bary, double &q1bary, double &q2bary)
   {
@@ -116,7 +121,7 @@ class Distance
 
   // Computes the shotest vector between a segment (p0, p1) and segment (q0, q1). Also returns the barycentric coordinates of the closest points on both segments; p0bary is the barycentric
   // coordinate of p0, etc. (The distance between the segments is the norm of this vector).
-  static Eigen::Vector3d edgeEdgeDistance(const Eigen::Vector3d &p0, const Eigen::Vector3d &p1,
+  inline Eigen::Vector3d edgeEdgeDistance(const Eigen::Vector3d &p0, const Eigen::Vector3d &p1,
 					  const Eigen::Vector3d &q0, const Eigen::Vector3d &q1,
 					  double &p0bary, double &p1bary,
 					  double &q0bary, double &q1bary)
@@ -177,13 +182,8 @@ class Distance
   // does not share a vertex. The mesh has verts1.size()/3 vertices, stored as consecutive triplets in the vector verts, and faces stored as vertex indices in the columns of faces. This method assumes
   // that each vertex is part of at least one triangle.
   // Distances between primitives *all* of whose vertices are in fixedVerts are ignored.
-  static double meshSelfDistance(const Eigen::VectorXd &verts, const Eigen::Matrix3Xi &faces, const std::set<int> &fixedVerts);
+  FPRF_API double meshSelfDistance(const Eigen::VectorXd &verts, const Eigen::Matrix3Xi &faces, const std::set<int> &fixedVerts);
 
- private:
-  static double clamp(double u)
-  {
-    return std::min(1.0, std::max(u, 0.0));
-  }
 };
 
 #endif

@@ -3,8 +3,9 @@
 
 #include <Eigen/Core>
 #include <vector>
+#include "FPRF.h"
 
-struct TimeInterval
+struct FPRF_API TimeInterval
 {
     TimeInterval(double tl, double tu) : l(tl), u(tu)
     {
@@ -25,7 +26,7 @@ struct TimeInterval
     double l, u;
 };
 
-class CTCD
+class FPRF_API CTCD
 {
 public:
     // Looks for collisions between edges (q0start, p0start) and (q1start, p1start) as they move towards

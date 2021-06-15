@@ -9,58 +9,63 @@
 using namespace Eigen;
 using namespace std;
 
-double Distance::meshSelfDistance(const Eigen::VectorXd &verts, const Eigen::Matrix3Xi &faces, const set<int> &fixedVerts)
+namespace Distance
 {
-	int nverts = verts.size()/3;
-	int nfaces = faces.cols();
-	Mesh m;
-	m.vertices = verts;
-	m.faces = faces;
-	double closest = std::numeric_limits<double>::infinity();
 
-	for(int i=0; i<nverts; i++)
-	{
-		for(int j=0; j<nfaces; j++)
-		{
-			if(m.vertexOfFace(i,j))
-				continue;
-			for(int k=0; k<3; k++)
-			{
-				double dist = (verts.segment<3>(3*i)-verts.segment<3>(3*m.faces.coeff(k,j))).squaredNorm();
-				if(dist < closest)
-					closest = dist;
-			}
-		}
-	}
-	closest = sqrt(closest);
+    double meshSelfDistance(const Eigen::VectorXd& verts, const Eigen::Matrix3Xi& faces, const set<int>& fixedVerts)
+    {
+        int nverts = verts.size() / 3;
+        int nfaces = faces.cols();
+        Mesh m;
+        m.vertices = verts;
+        m.faces = faces;
+        double closest = std::numeric_limits<double>::infinity();
 
-	History h(m.vertices);
-	h.finishHistory(m.vertices);
+        for (int i = 0; i < nverts; i++)
+        {
+            for (int j = 0; j < nfaces; j++)
+            {
+                if (m.vertexOfFace(i, j))
+                    continue;
+                for (int k = 0; k < 3; k++)
+                {
+                    double dist = (verts.segment<3>(3 * i) - verts.segment<3>(3 * m.faces.coeff(k, j))).squaredNorm();
+                    if (dist < closest)
+                        closest = dist;
+                }
+            }
+        }
+        closest = sqrt(closest);
 
-	set<VertexFaceStencil> vfs;
-	set<EdgeEdgeStencil> ees;
+        History h(m.vertices);
+        h.finishHistory(m.vertices);
 
-	AABBBroadPhase bp;
+        set<VertexFaceStencil> vfs;
+        set<EdgeEdgeStencil> ees;
 
-	bp.findCollisionCandidates(h, m, closest, vfs, ees, fixedVerts);	
+        AABBBroadPhase bp;
 
-	std::cout << "Checking " << vfs.size() << " vertex-face and " << ees.size() << " edge-edge stencils" << std::endl;
+        bp.findCollisionCandidates(h, m, closest, vfs, ees, fixedVerts);	
 
-	closest = std::numeric_limits<double>::infinity();
+        std::cout << "Checking " << vfs.size() << " vertex-face and " << ees.size() << " edge-edge stencils" << std::endl;
 
-	for(set<VertexFaceStencil>::iterator it = vfs.begin(); it != vfs.end(); ++it)
-	{
-		double t;
-		double dist = Distance::vertexFaceDistance(verts.segment<3>(3*it->p), verts.segment<3>(3*it->q0), verts.segment<3>(3*it->q1), verts.segment<3>(3*it->q2), t, t, t).norm();
-		if(dist < closest)
-			closest = dist;
-	}
-	for(set<EdgeEdgeStencil>::iterator it = ees.begin(); it != ees.end(); ++it)
-	{
-		double t;
-		double dist = Distance::edgeEdgeDistance(verts.segment<3>(3*it->p0), verts.segment<3>(3*it->p1), verts.segment<3>(3*it->q0), verts.segment<3>(3*it->q1), t, t, t, t).norm();
-		if(dist < closest)
-			closest = dist;
-	}
-	return closest;
+        closest = std::numeric_limits<double>::infinity();
+
+        for (set<VertexFaceStencil>::iterator it = vfs.begin(); it != vfs.end(); ++it)
+        {
+            double t;
+            double dist = Distance::vertexFaceDistance(verts.segment<3>(3 * it->p), verts.segment<3>(3 * it->q0), verts.segment<3>(3 * it->q1), verts.segment<3>(3 * it->q2), t, t, t).norm();
+            if (dist < closest)
+                closest = dist;
+        }
+        for (set<EdgeEdgeStencil>::iterator it = ees.begin(); it != ees.end(); ++it)
+        {
+            double t;
+            double dist = Distance::edgeEdgeDistance(verts.segment<3>(3 * it->p0), verts.segment<3>(3 * it->p1), verts.segment<3>(3 * it->q0), verts.segment<3>(3 * it->q1), t, t, t, t).norm();
+            if (dist < closest)
+                closest = dist;
+        }
+        return closest;
+    }
+
 }

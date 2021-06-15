@@ -1,4 +1,7 @@
+#pragma once
+
 #include "RetrospectiveDetection.h"
+#include "FPRF.h"
 
 struct AABBNode
 {
@@ -31,7 +34,7 @@ struct AABBInteriorNode : public AABBNode
 		delete right;
 	}
 
-	virtual bool isLeaf() {return false;}
+	bool isLeaf() override {return false;}
 
 	int splitaxis;
 	AABBNode *left, *right;
@@ -39,15 +42,17 @@ struct AABBInteriorNode : public AABBNode
 
 struct AABBLeafNode : public AABBNode
 {
-	virtual bool isLeaf() {return true;}
+	bool isLeaf() override {return true;}
 
 	int face;
 };
 
-class AABBBroadPhase : public BroadPhase
+class FPRF_API AABBBroadPhase : public BroadPhase
 {
 public:
-	virtual void findCollisionCandidates(const History &h, const Mesh &m, double outerEta, std::set<VertexFaceStencil> &vfs, std::set<EdgeEdgeStencil> &ees, const std::set<int> &fixedVerts);
+    AABBBroadPhase();
+
+	void findCollisionCandidates(const History &h, const Mesh &m, double outerEta, std::set<VertexFaceStencil> &vfs, std::set<EdgeEdgeStencil> &ees, const std::set<int> &fixedVerts) override;
 private:
 	AABBNode *buildAABBTree(const History &h, const Mesh &m, double outerEta);
 	AABBNode *buildAABBInterior(std::vector<AABBNode *> &children);

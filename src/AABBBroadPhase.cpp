@@ -6,6 +6,11 @@
 
 using namespace std;
 
+AABBBroadPhase::AABBBroadPhase()
+{
+
+}
+
 void AABBBroadPhase::findCollisionCandidates(const History &h, const Mesh &m, double outerEta, set<VertexFaceStencil> &vfs, set<EdgeEdgeStencil> &ees, const std::set<int> &fixedVerts)
 {
 	vfs.clear();

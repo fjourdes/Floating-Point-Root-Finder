@@ -2,8 +2,9 @@
 #define VELOCITYFILTER_H
 
 #include <Eigen/Core>
+#include "FPRF.h"
 
-class VelocityFilter
+class FPRF_API VelocityFilter
 {
 public:
 	const static int DANGLING_VERTICES = -1;

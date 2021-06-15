@@ -9,7 +9,7 @@
 #include <Eigen/Core>
 
 class PenaltyGroup;
-class Mesh;
+struct Mesh;
 class History;
 class BroadPhase;
 class NarrowPhase;
